@@ -10,6 +10,7 @@ const SignupForm = () => {
     email: '',
     password: '',
   });
+  const [showAlert, setShowAlert] = useState(false);
   const [addUser, { error }] = useMutation(ADD_USER);
 
   const handleInputChange = (event) => {
