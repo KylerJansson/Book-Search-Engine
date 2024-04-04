@@ -13,6 +13,9 @@ const SignupForm = () => {
   const [addUser, { error }] = useMutation(ADD_USER, {
     onCompleted: (data) => {
       Auth.login(data.addUser.token);
+    },
+    if(error) {
+      console.error("Signup error:", error.message);
     }
   });
 

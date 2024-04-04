@@ -27,7 +27,7 @@ const SearchBooks = () => {
   const [saveBook] = useMutation(SAVE_BOOK, {
     onCompleted: (data) => {
       // After saving a book, update the savedBookIds state to include the new book's ID
-      setSavedBookIds([...savedBookIds, data.saveBook.savedBooks.map((book) => book.bookId)]);
+      setSaveBookIds([...savedBookIds, data.saveBook.savedBooks.map((book) => book.bookId)]);
     },
   });
 
