@@ -18,15 +18,3 @@ export const GET_ME = gql`
     }
   }
 `;
-
-export const SEARCH_BOOKS = gql`
-  query SearchBooks($title: String!) {
-    searchBooks(title: $title) {
-      bookId
-      authors
-      title
-      description
-      image
-    }
-  }
-`;
