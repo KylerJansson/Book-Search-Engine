@@ -7,7 +7,7 @@ const resolvers = {
         // Get the logged-in user
         me: async (_, __, context) => {
             if (!context.user) {
-                throw new AuthenticationError('Not logged in');
+                throw AuthenticationError('Not logged in');
             }
 
             return User.findById(context.user._id).populate('savedBooks');
@@ -19,13 +19,13 @@ const resolvers = {
             const user = await User.findOne({ email });
 
             if (!user) {
-                throw new AuthenticationError('Incorrect credentials');
+                throw AuthenticationError('Incorrect credentials');
             }
 
             const correctPw = await user.isCorrectPassword(password);
 
             if (!correctPw) {
-                throw new AuthenticationError('Incorrect credentials');
+                throw AuthenticationError('Incorrect credentials');
             }
 
             const token = signToken(user);
@@ -34,10 +34,10 @@ const resolvers = {
         },
 
         // Create a user
-        createUser: async (_, { username, email, password }) => {
+        addUser: async (_, { username, email, password }) => {
             const user = await User.create({ username, email, password });
             if (!user) {
-                throw new Error('Something went wrong creating the user');
+                throw Error('Something went wrong creating the user');
             }
 
             const token = signToken(user);
@@ -46,41 +46,24 @@ const resolvers = {
         },
 
         // Save a book
-        saveBook: async (_, { bookData }, context) => {
-            if (!context.user) {
-                throw new AuthenticationError('Not logged in');
+        saveBook: async (_, { input }, context) => {
+            if (context.user) {
+                return User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $addToSet: { savedBooks: input } }
+                );
             }
-
-            const updatedUser = await User.findByIdAndUpdate(
-                context.user._id,
-                { $push: { savedBooks: bookData } },
-                { new: true, runValidators: true }
-            ).populate('savedBooks');
-
-            if (!updatedUser) {
-                throw new Error('Could not save book');
-            }
-
-            return updatedUser;
         },
 
-        // Delete a book
-        deleteBook: async (_, { bookId }, context) => {
-            if (!context.user) {
-                throw new AuthenticationError('Not logged in');
+        //  Remove a book from Saved Books list
+        removeBook: async (_, { bookId }, context) => {
+            if (context.user) {
+                return User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { savedBooks: { bookId: bookId } } }
+                );
             }
-
-            const updatedUser = await User.findByIdAndUpdate(
-                context.user._id,
-                { $pull: { savedBooks: { bookId } } },
-                { new: true }
-            ).populate('savedBooks');
-
-            if (!updatedUser) {
-                throw new Error('Could not delete book');
-            }
-
-            return updatedUser;
+            throw AuthenticationError;
         },
     },
 };
